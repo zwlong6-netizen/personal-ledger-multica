@@ -1,49 +1,149 @@
 /**
  * 极简现代响应式前端单页应用 (Single File SPA)
  * 集成 Tailwind CSS + Lucide Icons + 首页看板 + 快速记账 + 账单明细 + 分类管理
+ * 支持【极客暗黑 (Cyber Dark)】与【清爽浅色 (Classic Light)】模式一键切换与持久化
  */
 
 export const HTML_CLIENT = `<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>个人记账本 - MVP</title>
-  <!-- Tailwind CSS CDN -->
+  <title>个人记账本 - Cyber Geek MVP</title>
+  <!-- Tailwind CSS CDN (启用 class-based dark mode) -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            cyber: {
+              bg: '#0B0F17',
+              card: '#111827',
+              border: 'rgba(5, 217, 232, 0.18)',
+              pink: '#FF2A6D',
+              cyan: '#05D9E8',
+              yellow: '#FEE715',
+              purple: '#9D4EDD',
+              neonGreen: '#10B981',
+            }
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'Fira Code', 'Roboto Mono', 'ui-monospace', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <!-- Google Fonts: JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
+    :root {
+      --bg-color: #F8FAFC;
+    }
+    html.dark {
+      --bg-color: #0B0F17;
+    }
     body {
       font-feature-settings: "tnum";
       -webkit-font-smoothing: antialiased;
-      background-color: #F8FAFC;
+      background-color: var(--bg-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
     .scrollbar-none::-webkit-scrollbar {
       display: none;
     }
+
+    /* 赛博网格背景纹理 */
+    html.dark body {
+      background-image: 
+        linear-gradient(rgba(5, 217, 232, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(5, 217, 232, 0.03) 1px, transparent 1px);
+      background-size: 32px 32px;
+      background-position: -1px -1px;
+    }
+
+    /* 极客荧光辉光效果 (Glow & Pulse) */
+    .glow-cyan {
+      box-shadow: 0 0 15px rgba(5, 217, 232, 0.35), inset 0 0 10px rgba(5, 217, 232, 0.1);
+    }
+    .glow-pink {
+      box-shadow: 0 0 15px rgba(255, 42, 109, 0.35), inset 0 0 10px rgba(255, 42, 109, 0.1);
+    }
+    .glow-purple {
+      box-shadow: 0 0 18px rgba(157, 78, 221, 0.4);
+    }
+
+    /* 记账按钮悬停脉冲辉光 */
+    @keyframes pulse-glow {
+      0%, 100% {
+        box-shadow: 0 0 15px rgba(5, 217, 232, 0.5), 0 0 30px rgba(5, 217, 232, 0.2);
+      }
+      50% {
+        box-shadow: 0 0 25px rgba(5, 217, 232, 0.8), 0 0 45px rgba(5, 217, 232, 0.4);
+      }
+    }
+    .btn-cyber-pulse:hover {
+      animation: pulse-glow 1.8s infinite ease-in-out;
+    }
+
+    /* 拟态微磨砂边框 */
+    .cyber-glass {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    /* 等宽字体类 */
+    .font-num {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    /* 数字滚动跳动感过渡 */
+    .num-bounce {
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .num-bounce.bump {
+      transform: scale(1.06);
+    }
   </style>
 </head>
-<body class="text-slate-800 antialiased flex flex-col min-h-screen">
+<body class="text-slate-800 dark:text-slate-200 antialiased flex flex-col min-h-screen">
 
   <!-- 顶部导航栏 -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+  <header class="bg-white/90 dark:bg-[#0D1117]/90 border-b border-slate-200 dark:border-cyan-500/20 sticky top-0 z-30 shadow-xs dark:shadow-[0_4px_20px_rgba(0,0,0,0.5)] cyber-glass transition-colors">
     <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
-          <i data-lucide="wallet" class="w-5 h-5"></i>
+        <div class="w-10 h-10 rounded-xl bg-blue-600 dark:bg-gradient-to-tr dark:from-[#05D9E8] dark:to-[#9D4EDD] flex items-center justify-center text-white shadow-md shadow-blue-500/20 dark:shadow-[0_0_15px_rgba(5,217,232,0.5)] transition-all">
+          <i data-lucide="terminal" class="w-5 h-5 hidden dark:block"></i>
+          <i data-lucide="wallet" class="w-5 h-5 block dark:hidden"></i>
         </div>
         <div>
-          <h1 class="text-lg font-bold text-slate-900 leading-none">个人记账本</h1>
-          <p class="text-xs text-slate-500 mt-1">智能·清晰·分单位无损记账</p>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-lg font-bold text-slate-900 dark:text-white leading-none tracking-tight">个人记账本</h1>
+            <span class="hidden dark:inline-block text-[10px] font-num px-1.5 py-0.5 rounded border border-cyan-400/40 text-cyan-400 bg-cyan-950/40 uppercase tracking-widest font-semibold">CYBER_v1.0</span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-cyan-400/60 mt-1 font-medium font-num">智能·清晰·分单位无损记账</p>
         </div>
       </div>
-      <div class="flex items-center space-x-3">
+      <div class="flex items-center space-x-2.5 sm:space-x-3">
+        <!-- 主题切换 Switch Button -->
+        <button id="themeToggleBtn" onclick="toggleTheme()" class="relative p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700 dark:border dark:border-cyan-500/30 text-slate-700 dark:text-cyan-400 transition-all cursor-pointer flex items-center space-x-1" title="切换极客暗黑/清爽浅色模式">
+          <i id="themeIconSun" data-lucide="sun" class="w-4 h-4 text-amber-500 hidden dark:block"></i>
+          <i id="themeIconMoon" data-lucide="moon" class="w-4 h-4 text-indigo-600 block dark:hidden"></i>
+          <span id="themeText" class="text-xs font-semibold hidden sm:inline-block font-num">极客暗黑</span>
+        </button>
+
         <!-- 月份切换 -->
-        <input type="month" id="monthPicker" class="text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border-0 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
-        <!-- 记账快捷触发按钮 -->
-        <button onclick="openTransactionModal()" class="flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-sm font-medium px-3.5 py-1.5 rounded-lg shadow-sm shadow-blue-600/30 transition-all">
-          <i data-lucide="plus" class="w-4 h-4"></i>
+        <input type="month" id="monthPicker" class="text-xs sm:text-sm font-semibold font-num text-slate-700 dark:text-cyan-300 bg-slate-100 dark:bg-slate-800/90 hover:bg-slate-200 dark:hover:bg-slate-700 border-0 dark:border dark:border-cyan-500/30 rounded-xl px-2.5 sm:px-3 py-1.5 focus:ring-2 focus:ring-blue-500 dark:focus:ring-cyan-400 transition-all cursor-pointer">
+        
+        <!-- 记账快捷触发按钮 (带脉冲辉光与极客特效) -->
+        <button onclick="openTransactionModal()" class="btn-cyber-pulse flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-700 dark:bg-gradient-to-r dark:from-[#05D9E8] dark:to-[#00B4D8] active:scale-95 text-white dark:text-[#0B0F17] text-sm font-bold px-3.5 py-1.5 rounded-xl shadow-sm shadow-blue-600/30 dark:shadow-[0_0_15px_rgba(5,217,232,0.4)] transition-all">
+          <i data-lucide="plus" class="w-4 h-4 stroke-[3]"></i>
           <span>记一笔</span>
         </button>
       </div>
@@ -56,94 +156,101 @@ export const HTML_CLIENT = `<!DOCTYPE html>
     <!-- 1. 核心看板概览卡片 (Dashboard Overview) -->
     <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <!-- 当月净结余卡片 -->
-      <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-5 text-white shadow-lg shadow-blue-600/15 relative overflow-hidden">
-        <div class="absolute -right-4 -bottom-4 opacity-15">
-          <i data-lucide="scale" class="w-28 h-28"></i>
+      <div class="bg-gradient-to-br from-blue-600 to-indigo-700 dark:from-[#111827] dark:to-[#1a103c] rounded-2xl p-5 text-white shadow-lg shadow-blue-600/15 dark:shadow-[0_0_20px_rgba(157,78,221,0.25)] border border-transparent dark:border-purple-500/30 relative overflow-hidden transition-all">
+        <div class="absolute -right-4 -bottom-4 opacity-15 dark:opacity-20 text-cyan-400">
+          <i data-lucide="cpu" class="w-28 h-28 hidden dark:block"></i>
+          <i data-lucide="scale" class="w-28 h-28 block dark:hidden"></i>
         </div>
-        <p class="text-xs font-medium text-blue-100 uppercase tracking-wider">当月净结余 (Balance)</p>
-        <div id="statBalance" class="text-3xl font-black mt-2 tracking-tight">¥0.00</div>
-        <div class="mt-3 flex items-center text-xs text-blue-100">
+        <div class="flex items-center justify-between">
+          <p class="text-xs font-semibold text-blue-100 dark:text-purple-300 uppercase tracking-wider font-num">当月净结余 [NET_BALANCE]</p>
+          <span class="hidden dark:inline-block w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+        </div>
+        <div id="statBalance" class="num-bounce font-num text-3xl font-extrabold mt-2 tracking-tight text-white dark:text-cyan-300 dark:drop-shadow-[0_0_10px_rgba(5,217,232,0.5)]">¥0.00</div>
+        <div class="mt-3 flex items-center text-xs text-blue-100 dark:text-purple-200/80 font-num">
           <span id="statTxCount">共 0 笔明细</span>
         </div>
       </div>
 
       <!-- 月度总支出卡片 -->
-      <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs relative overflow-hidden">
+      <div class="bg-white dark:bg-[#111827]/90 rounded-2xl p-5 border border-slate-200/80 dark:border-rose-500/25 shadow-xs dark:shadow-[0_0_15px_rgba(255,42,109,0.12)] relative overflow-hidden transition-all cyber-glass">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">本月总支出</span>
-          <span class="w-7 h-7 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center">
+          <span class="text-xs font-semibold text-slate-500 dark:text-rose-400/80 uppercase tracking-wider font-num">本月总支出 [OUTFLOW]</span>
+          <span class="w-7 h-7 rounded-full bg-rose-50 dark:bg-rose-950/60 text-rose-500 dark:text-[#FF2A6D] flex items-center justify-center dark:border dark:border-rose-500/30">
             <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
           </span>
         </div>
-        <div id="statExpense" class="text-2xl font-bold text-rose-600 mt-2">¥0.00</div>
-        <p class="text-xs text-slate-400 mt-2">严格采用整型分计算</p>
+        <div id="statExpense" class="num-bounce font-num text-2xl font-bold text-rose-600 dark:text-[#FF2A6D] mt-2 dark:drop-shadow-[0_0_8px_rgba(255,42,109,0.5)]">¥0.00</div>
+        <p class="text-xs text-slate-400 dark:text-slate-500 mt-2 font-num">严格整型分 (Integer Cents)</p>
       </div>
 
       <!-- 月度总收入卡片 -->
-      <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs relative overflow-hidden">
+      <div class="bg-white dark:bg-[#111827]/90 rounded-2xl p-5 border border-slate-200/80 dark:border-cyan-500/25 shadow-xs dark:shadow-[0_0_15px_rgba(5,217,232,0.12)] relative overflow-hidden transition-all cyber-glass">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">本月总收入</span>
-          <span class="w-7 h-7 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+          <span class="text-xs font-semibold text-slate-500 dark:text-emerald-400/80 uppercase tracking-wider font-num">本月总收入 [INFLOW]</span>
+          <span class="w-7 h-7 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-[#05D9E8] flex items-center justify-center dark:border dark:border-cyan-500/30">
             <i data-lucide="arrow-down-left" class="w-4 h-4"></i>
           </span>
         </div>
-        <div id="statIncome" class="text-2xl font-bold text-emerald-600 mt-2">¥0.00</div>
-        <p class="text-xs text-slate-400 mt-2">资金流水健康度良好</p>
+        <div id="statIncome" class="num-bounce font-num text-2xl font-bold text-emerald-600 dark:text-[#05D9E8] mt-2 dark:drop-shadow-[0_0_8px_rgba(5,217,232,0.5)]">¥0.00</div>
+        <p class="text-xs text-slate-400 dark:text-slate-500 mt-2 font-num">资金流水状态健康 (STATUS: OK)</p>
       </div>
     </section>
 
     <!-- 2. 分类支出占比与统计进度 -->
-    <section class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
+    <section class="bg-white dark:bg-[#111827]/90 rounded-2xl p-5 border border-slate-200/80 dark:border-cyan-500/20 shadow-xs dark:shadow-[0_0_15px_rgba(0,0,0,0.4)] transition-all cyber-glass">
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center space-x-2">
-          <i data-lucide="pie-chart" class="w-5 h-5 text-blue-600"></i>
-          <h2 class="text-base font-bold text-slate-900">支出分类分布</h2>
+          <i data-lucide="pie-chart" class="w-5 h-5 text-blue-600 dark:text-cyan-400"></i>
+          <h2 class="text-base font-bold text-slate-900 dark:text-white">支出分类分布</h2>
         </div>
-        <button onclick="openCategoryManageModal()" class="text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center space-x-1">
+        <button onclick="openCategoryManageModal()" class="text-xs font-medium text-blue-600 dark:text-cyan-400 hover:text-blue-700 dark:hover:text-cyan-300 flex items-center space-x-1 px-2.5 py-1 rounded-lg dark:bg-slate-800/80 dark:border dark:border-cyan-500/30 transition-all">
           <i data-lucide="settings" class="w-3.5 h-3.5"></i>
           <span>分类管理</span>
         </button>
       </div>
       <div id="categoryDistributionContainer" class="space-y-3">
         <!-- 动态渲染分类条 -->
-        <p class="text-sm text-slate-400 py-3 text-center">暂无支出数据</p>
+        <p class="text-sm text-slate-400 dark:text-slate-500 py-3 text-center">暂无支出数据</p>
       </div>
     </section>
 
     <!-- 3. 账单流水列表明细 (Transactions) -->
-    <section class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-      <div class="p-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
+    <section class="bg-white dark:bg-[#111827]/90 rounded-2xl border border-slate-200/80 dark:border-cyan-500/20 shadow-xs dark:shadow-[0_0_15px_rgba(0,0,0,0.4)] overflow-hidden transition-all cyber-glass">
+      <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center space-x-2">
-          <i data-lucide="receipt-text" class="w-5 h-5 text-blue-600"></i>
-          <h2 class="text-base font-bold text-slate-900">账单明细流水</h2>
+          <i data-lucide="receipt-text" class="w-5 h-5 text-blue-600 dark:text-cyan-400"></i>
+          <h2 class="text-base font-bold text-slate-900 dark:text-white">账单明细流水</h2>
         </div>
         <!-- 筛选过滤器 -->
         <div class="flex items-center space-x-2">
-          <select id="filterType" onchange="loadTransactions()" class="text-xs font-medium bg-slate-100 text-slate-700 border-0 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-blue-500">
-            <option value="ALL">全部收支</option>
-            <option value="EXPENSE">仅支出</option>
-            <option value="INCOME">仅收入</option>
+          <select id="filterType" onchange="loadTransactions()" class="text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-cyan-300 border-0 dark:border dark:border-cyan-500/30 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-blue-500 dark:focus:ring-cyan-400 font-num">
+            <option value="ALL">全部收支 (ALL)</option>
+            <option value="EXPENSE">仅支出 (EXP)</option>
+            <option value="INCOME">仅收入 (INC)</option>
           </select>
-          <select id="filterCategory" onchange="loadTransactions()" class="text-xs font-medium bg-slate-100 text-slate-700 border-0 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-blue-500">
+          <select id="filterCategory" onchange="loadTransactions()" class="text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-cyan-300 border-0 dark:border dark:border-cyan-500/30 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-blue-500 dark:focus:ring-cyan-400 font-num">
             <option value="">全部分类</option>
           </select>
         </div>
       </div>
 
       <!-- 明细列表流 -->
-      <div id="transactionList" class="divide-y divide-slate-100">
-        <div class="py-12 text-center text-slate-400 text-sm">加载中...</div>
+      <div id="transactionList" class="divide-y divide-slate-100 dark:divide-slate-800/80">
+        <div class="py-12 text-center text-slate-400 dark:text-slate-500 text-sm">加载中...</div>
       </div>
     </section>
 
   </main>
 
   <!-- 记账弹窗表单 Modal -->
-  <div id="txModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 hidden">
-    <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200">
-      <div class="p-5 border-b border-slate-100 flex items-center justify-between">
-        <h3 id="txModalTitle" class="text-base font-bold text-slate-900">记一笔账</h3>
-        <button onclick="closeTransactionModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+  <div id="txModal" class="fixed inset-0 z-50 bg-slate-900/40 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-[#111827] border border-transparent dark:border-cyan-500/40 w-full max-w-md rounded-2xl shadow-xl dark:shadow-[0_0_30px_rgba(5,217,232,0.25)] overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="edit-3" class="w-4 h-4 text-blue-600 dark:text-cyan-400"></i>
+          <h3 id="txModalTitle" class="text-base font-bold text-slate-900 dark:text-white">记一笔账</h3>
+        </div>
+        <button onclick="closeTransactionModal()" class="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 p-1 rounded-lg">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -152,28 +259,28 @@ export const HTML_CLIENT = `<!DOCTYPE html>
         <input type="hidden" id="txId">
 
         <!-- 收支类型切换 Switch -->
-        <div class="grid grid-cols-2 p-1 bg-slate-100 rounded-xl text-center font-semibold text-sm">
-          <button type="button" id="tabExpense" onclick="switchTxType('EXPENSE')" class="py-2 rounded-lg bg-rose-500 text-white shadow-xs transition-all">
-            支出 (Expense)
+        <div class="grid grid-cols-2 p-1 bg-slate-100 dark:bg-slate-800/90 rounded-xl text-center font-semibold text-sm">
+          <button type="button" id="tabExpense" onclick="switchTxType('EXPENSE')" class="py-2 rounded-lg bg-rose-500 text-white shadow-xs dark:bg-[#FF2A6D] dark:shadow-[0_0_12px_rgba(255,42,109,0.5)] transition-all font-num">
+            支出 (EXPENSE)
           </button>
-          <button type="button" id="tabIncome" onclick="switchTxType('INCOME')" class="py-2 rounded-lg text-slate-600 hover:text-slate-900 transition-all">
-            收入 (Income)
+          <button type="button" id="tabIncome" onclick="switchTxType('INCOME')" class="py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all font-num">
+            收入 (INCOME)
           </button>
         </div>
 
         <!-- 金额输入与精度校验 -->
         <div>
-          <label class="block text-xs font-medium text-slate-500 mb-1">金额 (元)</label>
+          <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 font-num">金额 (CNY / 元)</label>
           <div class="relative">
-            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg font-bold text-slate-400">¥</span>
-            <input type="number" step="0.01" min="0.01" max="999999999.99" required id="txAmount" placeholder="0.00" class="w-full pl-8 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xl font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg font-bold text-slate-400 dark:text-cyan-400/70 font-num">¥</span>
+            <input type="number" step="0.01" min="0.01" max="999999999.99" required id="txAmount" placeholder="0.00" class="w-full pl-8 pr-4 py-2.5 bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-cyan-500/30 rounded-xl text-xl font-bold font-num text-slate-900 dark:text-cyan-300 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500 dark:focus:ring-cyan-400 focus:border-blue-500 dark:focus:border-cyan-400 transition-all">
           </div>
-          <p class="text-[11px] text-slate-400 mt-1">底层采用以分为单位整型存储，杜绝浮点精度丢失</p>
+          <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1 font-num">底层整型分无损计算 (Stored in Integer Cents)</p>
         </div>
 
         <!-- 分类选择网格 -->
         <div>
-          <label class="block text-xs font-medium text-slate-500 mb-1.5">选择分类</label>
+          <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5 font-num">选择分类 (CATEGORY)</label>
           <div id="txCategoryGrid" class="grid grid-cols-4 gap-2 max-h-40 overflow-y-auto p-1 scrollbar-none">
             <!-- 动态分类按钮 -->
           </div>
@@ -182,50 +289,50 @@ export const HTML_CLIENT = `<!DOCTYPE html>
         <!-- 记账时间与备注 -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-medium text-slate-500 mb-1">交易时间</label>
-            <input type="datetime-local" id="txTime" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:ring-2 focus:ring-blue-500">
+            <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 font-num">交易时间</label>
+            <input type="datetime-local" id="txTime" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-cyan-500/30 rounded-xl text-xs font-medium font-num text-slate-800 dark:text-slate-200 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500 dark:focus:ring-cyan-400">
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-500 mb-1">备注说明 (选填)</label>
-            <input type="text" id="txNote" maxlength="100" placeholder="如午餐聚会/奖金" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:ring-2 focus:ring-blue-500">
+            <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 font-num">备注说明 (选填)</label>
+            <input type="text" id="txNote" maxlength="100" placeholder="如午餐聚会/奖金" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-cyan-500/30 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-200 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500 dark:focus:ring-cyan-400">
           </div>
         </div>
 
         <div class="pt-2 flex items-center space-x-3">
-          <button type="button" onclick="closeTransactionModal()" class="w-1/3 py-2.5 border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium text-sm rounded-xl transition-all">取消</button>
-          <button type="submit" class="w-2/3 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-semibold text-sm rounded-xl shadow-md shadow-blue-600/30 transition-all">保存账单</button>
+          <button type="button" onclick="closeTransactionModal()" class="w-1/3 py-2.5 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium text-sm rounded-xl transition-all">取消</button>
+          <button type="submit" class="w-2/3 py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-gradient-to-r dark:from-[#05D9E8] dark:to-[#00B4D8] active:scale-98 text-white dark:text-[#0B0F17] font-bold text-sm rounded-xl shadow-md shadow-blue-600/30 dark:shadow-[0_0_15px_rgba(5,217,232,0.4)] transition-all">保存账单</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- 分类管理弹窗 Modal -->
-  <div id="catModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 hidden">
-    <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[85vh]">
-      <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+  <div id="catModal" class="fixed inset-0 z-50 bg-slate-900/40 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-[#111827] border border-transparent dark:border-cyan-500/40 w-full max-w-lg rounded-2xl shadow-xl dark:shadow-[0_0_30px_rgba(5,217,232,0.25)] overflow-hidden flex flex-col max-h-[85vh]">
+      <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
         <div>
-          <h3 class="text-base font-bold text-slate-900">分类管理</h3>
-          <p class="text-xs text-slate-400 mt-0.5">支持自定义分类与防删保护拦截</p>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">分类管理</h3>
+          <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5 font-num">支持自定义分类与防删保护拦截</p>
         </div>
-        <button onclick="closeCategoryManageModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+        <button onclick="closeCategoryManageModal()" class="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 p-1 rounded-lg">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
       <!-- 分类创建表单 -->
-      <div class="p-4 bg-slate-50 border-b border-slate-200">
+      <div class="p-4 bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
         <form onsubmit="submitNewCategory(event)" class="space-y-3">
           <div class="grid grid-cols-3 gap-2">
-            <select id="newCatType" class="text-xs font-medium bg-white border border-slate-200 rounded-lg px-2.5 py-2">
+            <select id="newCatType" class="text-xs font-medium bg-white dark:bg-slate-800 border border-slate-200 dark:border-cyan-500/30 text-slate-800 dark:text-slate-200 rounded-lg px-2.5 py-2 font-num">
               <option value="EXPENSE">支出分类</option>
               <option value="INCOME">收入分类</option>
             </select>
-            <input type="text" id="newCatName" placeholder="分类名称(如猫粮)" required maxlength="20" class="col-span-2 text-xs font-medium bg-white border border-slate-200 rounded-lg px-3 py-2">
+            <input type="text" id="newCatName" placeholder="分类名称(如猫粮)" required maxlength="20" class="col-span-2 text-xs font-medium bg-white dark:bg-slate-800 border border-slate-200 dark:border-cyan-500/30 text-slate-800 dark:text-slate-200 rounded-lg px-3 py-2">
           </div>
           <div class="flex items-center space-x-2">
-            <input type="text" id="newCatIcon" placeholder="Lucide图标名(如Cat/Coffee)" value="Tag" required class="flex-1 text-xs font-medium bg-white border border-slate-200 rounded-lg px-3 py-2">
-            <input type="color" id="newCatColor" value="#3B82F6" class="w-9 h-8 p-0.5 border border-slate-200 rounded-lg cursor-pointer bg-white">
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-all">
+            <input type="text" id="newCatIcon" placeholder="Lucide图标名(如Cat/Coffee)" value="Tag" required class="flex-1 text-xs font-medium font-num bg-white dark:bg-slate-800 border border-slate-200 dark:border-cyan-500/30 text-slate-800 dark:text-slate-200 rounded-lg px-3 py-2">
+            <input type="color" id="newCatColor" value="#05D9E8" class="w-9 h-8 p-0.5 border border-slate-200 dark:border-cyan-500/30 rounded-lg cursor-pointer bg-white dark:bg-slate-800">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 dark:bg-gradient-to-r dark:from-[#05D9E8] dark:to-[#00B4D8] text-white dark:text-[#0B0F17] text-xs font-bold px-4 py-2 rounded-lg transition-all">
               + 添加分类
             </button>
           </div>
@@ -233,16 +340,17 @@ export const HTML_CLIENT = `<!DOCTYPE html>
       </div>
 
       <!-- 分类列表 -->
-      <div id="catModalList" class="p-4 overflow-y-auto divide-y divide-slate-100 flex-1 space-y-2">
+      <div id="catModalList" class="p-4 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/80 flex-1 space-y-2">
         <!-- 动态生成 -->
       </div>
     </div>
   </div>
 
-  <!-- Toast 轻提示 -->
-  <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg text-sm flex items-center space-x-2 transition-all transform translate-y-20 opacity-0 pointer-events-none">
-    <i id="toastIcon" data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
-    <span id="toastMsg">操作成功</span>
+  <!-- 极客终端风格 Toast 轻提示 -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-900/95 dark:bg-[#0D1117]/95 border border-slate-800 dark:border-cyan-500/40 text-white px-4 py-3 rounded-xl shadow-lg dark:shadow-[0_0_20px_rgba(5,217,232,0.3)] text-sm flex items-center space-x-2.5 transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none cyber-glass font-num">
+    <span id="toastTag" class="text-[10px] px-1 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-500/40 font-bold uppercase">SYS</span>
+    <i id="toastIcon" data-lucide="check-circle" class="w-4 h-4 text-emerald-400 dark:text-cyan-400"></i>
+    <span id="toastMsg" class="font-medium text-xs sm:text-sm">操作成功</span>
   </div>
 
   <script>
@@ -252,8 +360,41 @@ export const HTML_CLIENT = `<!DOCTYPE html>
     let selectedTxType = 'EXPENSE';
     let selectedCatId = null;
 
+    // 主题管理与 localStorage 持久化
+    const THEME_STORAGE_KEY = 'personal_ledger_theme';
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+      // 默认提供炫酷极客风 (Cyber Dark)
+      const isDark = savedTheme ? savedTheme === 'dark' : true;
+      applyTheme(isDark);
+    }
+
+    function applyTheme(isDark) {
+      const htmlEl = document.documentElement;
+      const themeText = document.getElementById('themeText');
+      if (isDark) {
+        htmlEl.classList.add('dark');
+        if (themeText) themeText.innerText = '极客暗黑';
+      } else {
+        htmlEl.classList.remove('dark');
+        if (themeText) themeText.innerText = '清爽浅色';
+      }
+      lucide.createIcons();
+    }
+
+    function toggleTheme() {
+      const isCurrentlyDark = document.documentElement.classList.contains('dark');
+      const newDark = !isCurrentlyDark;
+      applyTheme(newDark);
+      localStorage.setItem(THEME_STORAGE_KEY, newDark ? 'dark' : 'light');
+      showToast(newDark ? '已切换至 极客暗黑 (Cyber Dark) 风格' : '已切换至 清爽浅色 (Classic Light) 风格');
+    }
+
     // 初始化运行
     window.addEventListener('DOMContentLoaded', async () => {
+      initTheme();
+
       document.getElementById('monthPicker').value = currentMonth;
       document.getElementById('monthPicker').addEventListener('change', (e) => {
         currentMonth = e.target.value;
@@ -279,19 +420,33 @@ export const HTML_CLIENT = `<!DOCTYPE html>
       return '¥' + Number(amount || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    // 提示 Toast
+    // 数字滚动跳动感视觉触发
+    function triggerNumberBounce(el) {
+      if (!el) return;
+      el.classList.remove('bump');
+      void el.offsetWidth; // 触发 reflow
+      el.classList.add('bump');
+      setTimeout(() => el.classList.remove('bump'), 250);
+    }
+
+    // 提示 Toast (极客终端风格反馈)
     function showToast(msg, isError = false) {
       const toast = document.getElementById('toast');
       const toastMsg = document.getElementById('toastMsg');
       const toastIcon = document.getElementById('toastIcon');
+      const toastTag = document.getElementById('toastTag');
 
       toastMsg.innerText = msg;
       if (isError) {
+        toastTag.className = 'text-[10px] px-1.5 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-500/50 font-bold font-num uppercase';
+        toastTag.innerText = 'ERR';
         toastIcon.setAttribute('data-lucide', 'alert-circle');
         toastIcon.className = 'w-4 h-4 text-rose-400';
       } else {
+        toastTag.className = 'text-[10px] px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-500/50 font-bold font-num uppercase';
+        toastTag.innerText = 'SYS';
         toastIcon.setAttribute('data-lucide', 'check-circle');
-        toastIcon.className = 'w-4 h-4 text-emerald-400';
+        toastIcon.className = 'w-4 h-4 text-cyan-400';
       }
       lucide.createIcons();
 
@@ -333,12 +488,18 @@ export const HTML_CLIENT = `<!DOCTYPE html>
         const json = await res.json();
         if (json.success) {
           const d = json.data;
-          document.getElementById('statExpense').innerText = formatMoney(d.totalExpense);
-          document.getElementById('statIncome').innerText = formatMoney(d.totalIncome);
-          
+          const expEl = document.getElementById('statExpense');
+          const incEl = document.getElementById('statIncome');
           const balEl = document.getElementById('statBalance');
+
+          expEl.innerText = formatMoney(d.totalExpense);
+          incEl.innerText = formatMoney(d.totalIncome);
           balEl.innerText = formatMoney(d.balance);
           document.getElementById('statTxCount').innerText = \`共 \${d.transactionCount} 笔明细\`;
+
+          triggerNumberBounce(balEl);
+          triggerNumberBounce(expEl);
+          triggerNumberBounce(incEl);
         }
       } catch (err) {
         console.error(err);
@@ -356,19 +517,19 @@ export const HTML_CLIENT = `<!DOCTYPE html>
           container.innerHTML = items.map(it => \`
             <div>
               <div class="flex items-center justify-between text-xs font-semibold mb-1">
-                <span class="text-slate-700 flex items-center space-x-1.5">
-                  <span class="w-2.5 h-2.5 rounded-full" style="background-color: \${it.color}"></span>
+                <span class="text-slate-700 dark:text-slate-300 flex items-center space-x-1.5 font-medium">
+                  <span class="w-2.5 h-2.5 rounded-full shadow-xs" style="background-color: \${it.color}; box-shadow: 0 0 6px \${it.color}"></span>
                   <span>\${it.categoryName}</span>
                 </span>
-                <span class="text-slate-900 font-bold">\${formatMoney(it.amount)} <span class="text-slate-400 font-normal">(\${(it.percentage * 100).toFixed(1)}%)</span></span>
+                <span class="text-slate-900 dark:text-cyan-300 font-bold font-num">\${formatMoney(it.amount)} <span class="text-slate-400 dark:text-slate-500 font-normal">(\${(it.percentage * 100).toFixed(1)}%)</span></span>
               </div>
-              <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                <div class="h-full rounded-full transition-all duration-500" style="width: \${it.percentage * 100}%; background-color: \${it.color}"></div>
+              <div class="w-full bg-slate-100 dark:bg-slate-800/80 h-2 rounded-full overflow-hidden border border-transparent dark:border-slate-700/50">
+                <div class="h-full rounded-full transition-all duration-500" style="width: \${it.percentage * 100}%; background-color: \${it.color}; box-shadow: 0 0 8px \${it.color}"></div>
               </div>
             </div>
           \`).join('');
         } else {
-          container.innerHTML = '<p class="text-sm text-slate-400 py-3 text-center">本月暂无支出分类明细</p>';
+          container.innerHTML = '<p class="text-sm text-slate-400 dark:text-slate-500 py-3 text-center">本月暂无支出分类明细</p>';
         }
       } catch (err) {
         console.error(err);
@@ -392,7 +553,7 @@ export const HTML_CLIENT = `<!DOCTYPE html>
           const items = json.data.items;
           if (items.length === 0) {
             container.innerHTML = \`
-              <div class="py-12 text-center text-slate-400">
+              <div class="py-12 text-center text-slate-400 dark:text-slate-500">
                 <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
                 <p class="text-sm">本月暂无记账流水，点击右上角“记一笔”开始记录</p>
               </div>
@@ -401,28 +562,28 @@ export const HTML_CLIENT = `<!DOCTYPE html>
             container.innerHTML = items.map(tx => {
               const isExp = tx.type === 'EXPENSE';
               const sign = isExp ? '-' : '+';
-              const amtColor = isExp ? 'text-rose-600' : 'text-emerald-600';
+              const amtColor = isExp ? 'text-rose-600 dark:text-[#FF2A6D] dark:drop-shadow-[0_0_6px_rgba(255,42,109,0.4)]' : 'text-emerald-600 dark:text-[#05D9E8] dark:drop-shadow-[0_0_6px_rgba(5,217,232,0.4)]';
               const timeStr = new Date(tx.transactionTime).toLocaleString('zh-CN', {
                 month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
               });
 
               return \`
-                <div class="p-4 hover:bg-slate-50 transition-colors flex items-center justify-between group">
+                <div class="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors flex items-center justify-between group">
                   <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs" style="background-color: \${tx.category.color}15; color: \${tx.category.color}">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs border border-transparent dark:border-current/30" style="background-color: \${tx.category.color}15; color: \${tx.category.color}; box-shadow: 0 0 10px \${tx.category.color}25">
                       <i data-lucide="\${tx.category.icon.toLowerCase()}" class="w-5 h-5"></i>
                     </div>
                     <div>
-                      <div class="text-sm font-bold text-slate-900 flex items-center space-x-2">
+                      <div class="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center space-x-2">
                         <span>\${tx.category.name}</span>
-                        \${tx.note ? \`<span class="text-xs font-normal text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">\${tx.note}</span>\` : ''}
+                        \${tx.note ? \`<span class="text-xs font-normal text-slate-500 dark:text-cyan-300/80 bg-slate-100 dark:bg-slate-800/90 px-2 py-0.5 rounded-md border border-transparent dark:border-cyan-500/30">\${tx.note}</span>\` : ''}
                       </div>
-                      <div class="text-xs text-slate-400 mt-0.5">\${timeStr}</div>
+                      <div class="text-xs text-slate-400 dark:text-slate-500 mt-0.5 font-num">\${timeStr}</div>
                     </div>
                   </div>
                   <div class="flex items-center space-x-3">
-                    <span class="text-base font-extrabold \${amtColor}">\${sign}\${formatMoney(tx.amount)}</span>
-                    <button onclick="deleteTransaction('\${tx.id}')" title="删除明细" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-600 p-1.5 rounded-lg transition-all">
+                    <span class="text-base font-extrabold font-num \${amtColor}">\${sign}\${formatMoney(tx.amount)}</span>
+                    <button onclick="deleteTransaction('\${tx.id}')" title="删除明细" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-600 dark:text-slate-500 dark:hover:text-[#FF2A6D] p-1.5 rounded-lg transition-all">
                       <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>
                   </div>
@@ -463,11 +624,11 @@ export const HTML_CLIENT = `<!DOCTYPE html>
       const btnInc = document.getElementById('tabIncome');
 
       if (type === 'EXPENSE') {
-        btnExp.className = 'py-2 rounded-lg bg-rose-500 text-white shadow-xs transition-all';
-        btnInc.className = 'py-2 rounded-lg text-slate-600 hover:text-slate-900 transition-all';
+        btnExp.className = 'py-2 rounded-lg bg-rose-500 text-white shadow-xs dark:bg-[#FF2A6D] dark:shadow-[0_0_12px_rgba(255,42,109,0.5)] transition-all font-num';
+        btnInc.className = 'py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all font-num';
       } else {
-        btnInc.className = 'py-2 rounded-lg bg-emerald-500 text-white shadow-xs transition-all';
-        btnExp.className = 'py-2 rounded-lg text-slate-600 hover:text-slate-900 transition-all';
+        btnInc.className = 'py-2 rounded-lg bg-emerald-500 text-white shadow-xs dark:bg-[#05D9E8] dark:text-[#0B0F17] dark:shadow-[0_0_12px_rgba(5,217,232,0.5)] transition-all font-num';
+        btnExp.className = 'py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all font-num';
       }
 
       renderTxCategoryGrid();
@@ -482,11 +643,13 @@ export const HTML_CLIENT = `<!DOCTYPE html>
 
       grid.innerHTML = filtered.map(cat => {
         const isSelected = cat.id === selectedCatId;
-        const borderClass = isSelected ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold' : 'border-slate-200 hover:border-slate-300 bg-white text-slate-700';
+        const borderClass = isSelected
+          ? 'border-blue-600 bg-blue-50 text-blue-700 dark:border-cyan-400 dark:bg-cyan-950/60 dark:text-cyan-300 dark:shadow-[0_0_10px_rgba(5,217,232,0.3)] font-bold'
+          : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900/80 text-slate-700 dark:text-slate-300';
         return \`
           <button type="button" onclick="selectTxCategory('\${cat.id}')" class="p-2 border rounded-xl flex flex-col items-center justify-center space-y-1 text-xs transition-all \${borderClass}">
             <i data-lucide="\${cat.icon.toLowerCase()}" class="w-4 h-4" style="color: \${cat.color}"></i>
-            <span class="truncate w-full text-center">\${cat.name}</span>
+            <span class="truncate w-full text-center font-num">\${cat.name}</span>
           </button>
         \`;
       }).join('');
@@ -525,7 +688,7 @@ export const HTML_CLIENT = `<!DOCTYPE html>
 
         const json = await res.json();
         if (json.success) {
-          showToast('记账保存成功！');
+          showToast('记账保存成功！[TRANSACTION_SAVED]');
           closeTransactionModal();
           await loadAllData();
         } else {
@@ -543,7 +706,7 @@ export const HTML_CLIENT = `<!DOCTYPE html>
         const res = await fetch(\`/api/v1/transactions/\${id}\`, { method: 'DELETE' });
         const json = await res.json();
         if (json.success) {
-          showToast('删除记录成功');
+          showToast('删除记录成功 [RECORD_PURGED]');
           await loadAllData();
         } else {
           showToast(json.error?.message || '删除失败', true);
@@ -568,15 +731,15 @@ export const HTML_CLIENT = `<!DOCTYPE html>
       container.innerHTML = allCategories.map(cat => \`
         <div class="py-2.5 flex items-center justify-between text-xs">
           <div class="flex items-center space-x-2.5">
-            <span class="w-3 h-3 rounded-full" style="background-color: \${cat.color}"></span>
-            <span class="font-bold text-slate-800">\${cat.name}</span>
-            <span class="text-slate-400">(\${cat.type === 'EXPENSE' ? '支出' : '收入'})</span>
-            \${cat.isDefault ? '<span class="bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded text-[10px]">内置预设</span>' : ''}
+            <span class="w-3 h-3 rounded-full shadow-xs" style="background-color: \${cat.color}; box-shadow: 0 0 6px \${cat.color}"></span>
+            <span class="font-bold text-slate-800 dark:text-slate-100 font-num">\${cat.name}</span>
+            <span class="text-slate-400 dark:text-slate-500 font-num">(\${cat.type === 'EXPENSE' ? '支出' : '收入'})</span>
+            \${cat.isDefault ? '<span class="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-cyan-400/80 px-1.5 py-0.5 rounded text-[10px] border border-transparent dark:border-cyan-500/30 font-num">内置预设</span>' : ''}
           </div>
           <div class="flex items-center space-x-2">
-            <span class="text-slate-400">\${cat.transactionCount} 笔账单</span>
+            <span class="text-slate-400 dark:text-slate-500 font-num">\${cat.transactionCount} 笔账单</span>
             \${!cat.isDefault ? \`
-              <button onclick="deleteCategory('\${cat.id}')" class="text-rose-500 hover:text-rose-700 font-semibold px-2 py-1 rounded">删除</button>
+              <button onclick="deleteCategory('\${cat.id}')" class="text-rose-500 hover:text-rose-700 dark:text-[#FF2A6D] dark:hover:text-rose-400 font-semibold px-2 py-1 rounded transition-all font-num">删除</button>
             \` : ''}
           </div>
         </div>
@@ -599,7 +762,7 @@ export const HTML_CLIENT = `<!DOCTYPE html>
         });
         const json = await res.json();
         if (json.success) {
-          showToast('新增分类成功！');
+          showToast('新增分类成功！[CATEGORY_CREATED]');
           document.getElementById('newCatName').value = '';
           await loadCategories();
           renderCategoryModalList();
@@ -618,7 +781,7 @@ export const HTML_CLIENT = `<!DOCTYPE html>
         const res = await fetch(\`/api/v1/categories/\${id}\`, { method: 'DELETE' });
         const json = await res.json();
         if (json.success) {
-          showToast('分类删除成功');
+          showToast('分类删除成功 [CATEGORY_REMOVED]');
           await loadCategories();
           renderCategoryModalList();
         } else {
