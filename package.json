@@ -1,0 +1,18 @@
+{
+  "name": "personal-ledger-mvp",
+  "version": "1.0.0",
+  "description": "个人记账本 MVP 核心代码实现与原型工程",
+  "main": "src/server/index.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server/index.mjs",
+    "test": "node --test tests/unit/*.test.mjs"
+  },
+  "keywords": [
+    "ledger",
+    "accounting",
+    "mvp"
+  ],
+  "author": "zwlong66",
+  "license": "MIT"
+}
